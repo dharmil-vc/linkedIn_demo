@@ -4,13 +4,15 @@ import YAML from 'yamljs';
 import path from 'path';
 
 import { getAccesstoken } from '../controller/auth.controller.js';
-// import { retrievememberProfile } from '../controller/signin.controller.js';
+import { retrievememberProfile } from '../controller/signin.controller.js';
 
 const router = express.Router();
 const options = {
   customCss: '.swagger-ui .topbar { display: none }',
 };
-const swaggerDocument = YAML.load(path.join(__dirname, '../docs/swagger.yml'));
+const swaggerDocument = YAML.load(
+  path.join(path.resolve(), './src/docs/swagger.yml')
+);
 
 router.use(
   '/api-docs',
@@ -22,6 +24,6 @@ router.use(
 router.post('/authToken', getAccesstoken);
 
 // Retrieving Member Profiles Route
-// router.get('/userProfile', retrievememberProfile);
+router.get('/userProfile', retrievememberProfile);
 
 export default router;

@@ -5,10 +5,14 @@ import path from 'path';
 import InitiateMongoserver from './config/db.js';
 import router from './routes/index.js';
 
-// eslint-disable-next-line no-underscore-dangle
-global.__dirname = path.resolve();
+path.resolve();
 
-dotenv.config({ path: path.join(__dirname, './src/environment/.env') });
+// eslint-disable-next-line no-undef
+dotenv.config({ path: path.join(path.resolve(), './src/environment/.env') });
+console.log(
+  "🚀 ~ file: index.js ~ line 12 ~ path: path.join(path.resolve(), './src/environment/.env') ",
+  path.join(path.resolve(), './src/environment/.env')
+);
 
 const app = express();
 const port = process.env.PORT;
