@@ -9,11 +9,6 @@ path.resolve();
 
 // eslint-disable-next-line no-undef
 dotenv.config({ path: path.join(path.resolve(), './src/environment/.env') });
-console.log(
-  "🚀 ~ file: index.js ~ line 12 ~ path: path.join(path.resolve(), './src/environment/.env') ",
-  path.join(path.resolve(), './src/environment/.env')
-);
-
 const app = express();
 const port = process.env.PORT;
 
