@@ -1,0 +1,113 @@
+openapi: 3.0.0
+info:
+  title: Linkedin Developer APIs
+  version: 1.0.0
+  description: ''
+servers:
+  - url: 'http://localhost:4000'
+    description: Local
+  - url: 'https://www.linkedin.com'
+    description: prod
+paths:
+  /api/authToken:
+    post:
+      summary: Exchange Authorization Code for an Access Token
+      tags:
+        - Authorization API
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - grant_type
+                - code
+                - client_id
+                - client_secret
+                - redirect_uri
+              properties:
+                grant_type:
+                  type: string
+                  description: The value of this field should always be:authorization_code
+                  enum:
+                    - authorization_code
+                code:
+                  type: string
+                  description: The authorization code you received in Step 2.
+                client_id:
+                  type: string
+                  description: The Client ID value generated in Step 1.
+                client_secret:
+                  type: string
+                  description: The Secret Key value generated in Step 1.
+                redirect_uri:
+                  type: string
+                  description: The same redirect_uri value that you passed in the previous step.
+      responses:
+        '200':
+          description: Get Access Token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: 'string'
+                    example: 'AQXNnd2kXITHELmWblJigbHEuoFdfRhOwGQNnu...'
+                  expires_in:
+                    type: number
+                    example: 5184000
+        '401':
+          description: Unauthorized Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+              example:
+                error: invalid_request,
+                error_description: Unable to retrieve access token :authorization code not found
+        '400':
+          description: NOT found required parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/400'
+              example:
+                - error: invalid_request,
+                  error_description: A required parameter "client_secret" is missing
+                - error: invalid_request,
+                  error_description: A required parameter "client_id" is missing
+                - error: invalid_request,
+                  error_description: A required parameter "grant_type" is missing
+                - error: invalid_request,
+                  error_description: A required parameter "code" is missing
+                - error: invalid_redirect_uri,
+                  error_description: Unable to retrieve access token :appid/redirect uri/code verifier does not match authorization code. Or authorization code expired. Or external member binding exists
+                - error: invalid_redirect_uri,
+                  error_description: A required parameter "client_secret" is missing
+components:
+  schemas:
+    '401':
+      title: '401 Unauthorized Request'
+      type: object
+      description: Unauthorized Request
+      properties:
+        error:
+          type: string
+          description: Error Code for request
+        error_description:
+          type: string
+          description: Error message
+    '400':
+      title: '400 Invalid Parameters'
+      type: object
+      description: Missing a required paramter
+      properties:
+        error:
+          type: string
+          description: Error code for request
+        error_description:
+          type: string
+          description: Error message
