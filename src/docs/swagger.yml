@@ -87,6 +87,168 @@ paths:
                   error_description: Unable to retrieve access token :appid/redirect uri/code verifier does not match authorization code. Or authorization code expired. Or external member binding exists
                 - error: invalid_redirect_uri,
                   error_description: A required parameter "client_secret" is missing
+  /api/userProfile:
+    get:
+      summary: Get User Linkedin Profile
+      tags:
+        - User API
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Get Member's Profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firstName:
+                    type: object
+                    properties:
+                      localized:
+                        type: object
+                        properties:
+                          en-US:
+                            type: string
+                      preferredLocale:
+                        type: object
+                        properties:
+                          country:
+                            type: string
+                          language:
+                            type: string
+                  lastName:
+                    type: object
+                    properties:
+                      localized:
+                        type: object
+                        properties:
+                          en-US:
+                            type: string
+                      preferredLocale:
+                        type: object
+                        properties:
+                          country:
+                            type: string
+                          language:
+                            type: string
+                  profilePicture:
+                    type: object
+                    properties:
+                      displayImage:
+                        type: string
+                      displayImage~:
+                        type: object
+                        properties:
+                          paging:
+                            type: object
+                            properties:
+                              count:
+                                type: number
+                              start:
+                                type: number
+                              links:
+                                type: array
+                                items:
+                                  type: string
+                          elements:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                artifact:
+                                  type: string
+                                authorizationMethod:
+                                  type: string
+                                data:
+                                  type: object
+                                  properties:
+                                    com.linkedin.digitalmedia.mediaartifact.StillImage:
+                                      type: object
+                                      properties:
+                                        mediaType:
+                                          type: string
+                                        rawCodecSpec:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                        displaySize:
+                                          type: object
+                                          properties:
+                                            width:
+                                              type: number
+                                            uom:
+                                              type: string
+                                            height:
+                                              type: integer
+                                        storageSize:
+                                          type: object
+                                          properties:
+                                            width:
+                                              type: number
+                                            height:
+                                              type: number
+                                        storageAspectRatio:
+                                          type: object
+                                          properties:
+                                            widthAspect:
+                                              type: number
+                                            heightAspect:
+                                              type: number
+                                            formatted:
+                                              type: string
+                                        dislayAspectRatio:
+                                          type: object
+                                          properties:
+                                            widthAspect:
+                                              type: number
+                                            heightAspect:
+                                              type: number
+                                            formatted:
+                                              type: string
+                                identifiers:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      identifier:
+                                        type: string
+                                      index:
+                                        type: number
+                                      mediaType:
+                                        type: string
+                                      file:
+                                        type: string
+                                      identifierType:
+                                        type: string
+                                      identifierExpiresInSeconds:
+                                        type: number
+                  id:
+                    type: string
+                  elements:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        handle~:
+                          type: object
+                          properties:
+                            emailAddress:
+                              type: string
+                        handle:
+                          type: string
+        '401':
+          description: Unauthorized Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+              example:
+                error: invalid_request,
+                error_description: Unable to retrieve access token :authorization code not found
 components:
   schemas:
     '401':
@@ -111,3 +273,8 @@ components:
         error_description:
           type: string
           description: Error message
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
