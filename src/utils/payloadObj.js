@@ -1,21 +1,13 @@
-export const payload = (
-    id,
-    category,
-    text,
-    title,
-    description,
-    mediaUrl,
-    asset
-) => {
+export const payload = (data) => {
     const textObj = {
-        author: `urn:li:person:${id}`,
+        author: `urn:li:person:${data.authorId}`,
         lifecycleState: 'PUBLISHED',
         specificContent: {
             'com.linkedin.ugc.ShareContent': {
                 shareCommentary: {
-                    text: `${text}`,
+                    text: `${data.text}`,
                 },
-                shareMediaCategory: `${category}`,
+                shareMediaCategory: `${data.shareMediaCategory}`,
             },
         },
         visibility: {
@@ -24,23 +16,23 @@ export const payload = (
     };
 
     const articleObj = {
-        author: `urn:li:person:${id}`,
+        author: `urn:li:person:${data.authorId}`,
         lifecycleState: 'PUBLISHED',
         specificContent: {
             'com.linkedin.ugc.ShareContent': {
                 shareCommentary: {
-                    text: `${text}`,
+                    text: `${data.text}`,
                 },
                 shareMediaCategory: 'ARTICLE',
                 media: [
                     {
                         status: 'READY',
                         description: {
-                            text: `${description}`,
+                            text: `${data.mediaDescription}`,
                         },
-                        originalUrl: `${mediaUrl}`,
+                        originalUrl: `${data.mediaUrl}`,
                         title: {
-                            text: `${title}`,
+                            text: `${data.mediaTitle}`,
                         },
                     },
                 ],
@@ -53,7 +45,7 @@ export const payload = (
     const registerImageObj = {
         registerUploadRequest: {
             recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
-            owner: `urn:li:person:${id}`,
+            owner: `urn:li:person:${data.authorId}`,
             serviceRelationships: [
                 {
                     relationshipType: 'OWNER',
@@ -63,23 +55,23 @@ export const payload = (
         },
     };
     const imageObj = {
-        author: `urn:li:person:${id}`,
+        author: `urn:li:person:${data.authorId}`,
         lifecycleState: 'PUBLISHED',
         specificContent: {
             'com.linkedin.ugc.ShareContent': {
                 shareCommentary: {
-                    text: `${text}`,
+                    text: `${data.text}`,
                 },
                 shareMediaCategory: 'IMAGE',
                 media: [
                     {
                         status: 'READY',
                         description: {
-                            text: `${description}`,
+                            text: `${data.mediaDescription}`,
                         },
-                        media: `${asset}`,
+                        media: `${data.asset}`,
                         title: {
-                            text: `${title}`,
+                            text: `${data.mediaTitle}`,
                         },
                     },
                 ],
@@ -89,8 +81,7 @@ export const payload = (
             'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
         },
     };
-
-    switch (category) {
+    switch (data.shareMediaCategory) {
         case 'NONE':
             return textObj;
         case 'ARTICLE':

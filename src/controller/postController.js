@@ -1,105 +1,89 @@
 import axios from 'axios';
+import fs from 'fs';
+
 import { payload } from '../utils/payloadObj';
 
 export const postController = async (req, res) => {
-    const config = {
-        headers: { Authorization: `${req.headers.authorization}` },
-    };
-    const {
-        authorId,
-        shareMediaCategory,
-        text,
-        mediaTitle,
-        mediaDescription,
-        mediaUrl,
-        mediaAsset,
-    } = req.body;
+    try {
+        const config = {
+            headers: { Authorization: `${req.headers.authorization}` },
+        };
 
-    console.log(
-        '🚀 ~ file: postController.js ~ line 24 ~ postController ~ payload(authorId, text, shareMediaCategory)',
-        payload(authorId, shareMediaCategory)
-    );
-    switch (shareMediaCategory) {
-        case 'NONE':
-            axios
-                .post(
-                    'https://api.linkedin.com/v2/ugcPosts',
-                    payload(authorId, text, shareMediaCategory),
+        const postUrl = 'https://api.linkedin.com/v2/ugcPosts';
+
+        switch (req.body.shareMediaCategory) {
+            case 'NONE':
+                console.log(
+                    '🚀 in none ============',
+                    JSON.stringify(payload(req.body))
+                );
+                const textResp = await axios.post(
+                    `${postUrl}`,
+                    payload(req.body),
                     config
-                )
-                .then((resp) => {
-                    console.log(
-                        '🚀 ~ file: postController.js ~ line 35 ~ .then ~ resp',
-                        resp.data
-                    );
-                    return res.status(200).send(resp.data);
-                })
-                .catch((err) => {
-                    if (err.response) {
-                        return res
-                            .status(err.response.status)
-                            .json({ message: err });
-                    } else if (err.request) {
-                        return res.status(204).send(err.request);
-                        // Request was made but no response
-                    } else {
-                        console.log('error message', err.message);
-                    }
-                });
-            break;
-        case 'ARTICLE':
-            axios
-                .post(
-                    'https://api.linkedin.com/v2/ugcPosts',
-                    payload(
-                        authorId,
-                        text,
-                        shareMediaCategory,
-                        mediaTitle,
-                        mediaDescription,
-                        mediaUrl
-                    ),
+                );
+
+                res.status(textResp.status).send(textResp.data);
+
+                break;
+            case 'ARTICLE':
+                let articleResp = await axios.post(
+                    `${postUrl}`,
+                    payload(req.body),
                     config
-                )
-                .then((resp) => {
-                    console.log(
-                        '🚀 ~ file: postController.js ~ line 35 ~ .then ~ resp',
-                        resp.data
-                    );
-                    return res.status(200).send(resp.data);
-                })
-                .catch((err) => {
-                    if (err.response) {
-                        return res
-                            .status(err.response.status)
-                            .json({ message: err });
-                    } else if (err.request) {
-                        return res.status(204).send(err.request);
-                        // Request was made but no response
-                    } else {
-                        console.log('error message', err.message);
-                    }
-                });
-            break;
-        case 'IMAGE':
-            axios
-                .post(
+                );
+                res.status(200).send(articleResp.data);
+                break;
+            case 'IMAGE':
+                // register Image axios call
+                const registerImgResp = await axios.post(
                     'https://api.linkedin.com/v2/assets?action=registerUpload',
-                    payload(authorId, shareMediaCategory)[0],
+                    payload(req.body)[0],
                     config
-                )
-                .then((resp) => {
-                    console.log('response data', resp.data);
-                    const uploadUrl =
-                        resp.data['value']['uploadMechanism'][
-                            'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'
-                        ]['uploadUrl'];
-                    const asset = resp.data['value']['asset'];
+                );
 
-                    axios.post(`${uploadUrl}`, config);
-                    res.status(200).send(resp.data);
-                })
-                .catch((err) => console.log(err));
-            break;
+                console.log('Image registerd successfully');
+                if (!registerImgResp.data)
+                    return res.status(400).send('Image not registered');
+
+                // Image upload axios call
+                const uploadUrl =
+                    registerImgResp.data['value']['uploadMechanism'][
+                        'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'
+                    ]['uploadUrl'];
+
+                req.body.asset = registerImgResp.data['value']['asset'];
+                const file = fs.readFileSync(req.file.path);
+
+                await axios.post(`${uploadUrl}`, file, {
+                    headers: {
+                        'Content-Type': 'image/jpeg',
+                        Authorization: `${req.headers.authorization}`,
+                    },
+                });
+
+                console.log('Image uploaded successfully');
+
+                // create image post
+                const imagePostResp = await axios.post(
+                    `${postUrl}`,
+                    payload(req.body)[1],
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${req.headers.authorization}`,
+                        },
+                    }
+                );
+
+                console.log('Post created successfully');
+                res.status(imagePostResp.status).send(imagePostResp.data);
+                break;
+        }
+    } catch (err) {
+        console.log(
+            '🚀 ~ file: postController.js ~ line 114 ~ postController ~ err',
+            err
+        );
     }
 };
