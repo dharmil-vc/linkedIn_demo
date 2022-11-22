@@ -15,9 +15,6 @@ import {
 import {
   multerUpload
 } from '../middleware/uploadImg';
-import {
-  imageTypeChecker
-} from "../middleware/imageTypeChecker";
 // import { uploadText } from '../middleware/uploadImg';
 
 const router = express.Router();
@@ -41,6 +38,6 @@ router.post('/authToken', getAccesstoken);
 router.get('/userProfile', retrievememberProfile);
 
 // Creating post route
-router.post('/createPost', multerUpload, imageTypeChecker, postController);
+router.post('/createPost', multerUpload, postController);
 
 export default router;
