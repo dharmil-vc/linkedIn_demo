@@ -30,7 +30,7 @@ export const multerUpload = (req, res, next) => {
   upload(req, res, async (error) => {
     if (error) {
       console.error("error of multer upload", error);
-      res.status(500).send({
+      res.status(415).send({
         message: error.message
       })
     } else {

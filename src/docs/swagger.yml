@@ -249,6 +249,75 @@ paths:
               example:
                 error: invalid_request,
                 error_description: Unable to retrieve access token :authorization code not found
+  /api/createPost:
+    post:
+      summary: Create Post with text or Article or Image.
+      tags:
+        - Linkedin Posts API
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - text
+                - authorId
+                - shareMediaCategory
+              properties:
+                authorId:
+                  type: string
+                  example: "KCJAPTnAHO"
+                shareMediaCategory:
+                  type: string
+                  enum: ["IMAGE", "ARTICLE", "TEXT"]
+                  example: "IMAGE"
+                text:
+                  type: string
+                  example: "This is a first Post"
+                mediaTitle:
+                  type: string
+                  example: "This is an Media Title"
+                mediaDescription:
+                  type: string
+                  example: "This is an alt attribute"
+                image:
+                  type: string
+                  format: base64
+            encoding: # The same level as schema
+              image: # Property name (see above)
+                contentType: image/png, image/jpeg
+      responses:
+        "200":
+          description: "Get urn link of the created Post"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "urn:li:share:7000694782377267200"
+        "415":
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+              example: 
+                message: "Extension is not valid. Please upload with .png, .jpeg, .gif files only."
+        '401':
+          description: Unauthorized Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+              example:
+                error: invalid_request,
+                error_description: Unable to retrieve access token :authorization code not found
 components:
   schemas:
     '401':
@@ -273,6 +342,14 @@ components:
         error_description:
           type: string
           description: Error message
+    '415':
+      title: '415 Unsupported Media Type'
+      type: object
+      description: Invalid media type
+      properties:
+        message:
+          type: string
+          description: Error message for unsupported file
   securitySchemes:
     bearerAuth:
       type: http
